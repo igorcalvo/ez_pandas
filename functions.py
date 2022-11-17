@@ -1,4 +1,14 @@
 import pandas as pd
+import regex
+
+def read_csv(file_name: str, separator: str):
+    return pd.read_csv(file_name, separator=separator)
+
+def saving_csv(df: pd.DataFrame, file_name: str):
+    df.to_csv(f"{file_name}.csv", index=False)
+
+def saving_xlsx(df: pd.DataFrame, file_name: str):
+    df.to_excel(f"{file_name}.xlsx", index=False)
 
 def print_df(df: pd.DataFrame):
     print(df.to_string())
@@ -13,7 +23,71 @@ def get_headers(df: pd.DataFrame):
     return df.columns
 
 def get_value(df: pd.DataFrame, row: int, column: int):
-    return df.iloc[row,column]
+    # print(df.iloc[2, 2])
+    return df.iloc[row, column]
 
-def function(df: pd.DataFrame):
-    pass
+def get_column(df: pd.DataFrame, columns: list):
+    # df[['Attack', 'Defense']]
+    return df[columns]
+
+def get_row_by_index(df: pd.DataFrame, index: int):
+    # print(df.iloc[1:3].to_string())
+    return df.iloc[i]
+
+def loop_iterate(df: pd.DataFrame):
+    for index, row in df.iterrows():
+        print(index, row)
+
+def where_column_equals(df: pd.DataFrame, column: str, value):
+    return df.loc[(df[column] == value)]
+
+def where_column_doesnt_contain(df: pd.DataFrame, column: str, value: str):
+    # print(df.loc[(df['Type 1'] == "Grass") & (~df['Name'].str.contains("v"))])
+    return df.loc[~df[column].str.contains(value)]
+
+def where_column_regex(df: pd.DataFrame, column: str, regex: str = "^pi[a-z]*"):
+    # print(df.loc[df['Name'].str.contains("y|z", flags=re.I, regex=True)])
+    # print(df.loc[df['Name'].str.contains("^pi[a-z]*", flags=re.I, regex=True)])
+    return df.loc[df[column].str.contains(regex, flags=re.I, regex=True)]
+
+def redefine_index(df: pd.DataFrame):
+    df.reset_index(inplace=True, drop=True)
+
+def describe(df: pd.DataFrame):
+    return df.describe().to_string()
+
+def sort(df: pd.DataFrame, columns: list, asc_desc: list):
+    # df.sort_values(['Type 1', 'Name'], ascending=[0,1], inplace=True)
+    df.sort_values(columns, ascending=asc_desc, inplace=True)
+
+def drop_columns(df: pd.DataFrame, columns: list):
+    df.drop(columns=columns, inplace=True)
+
+def new_column_addition(df: pd.DataFrame, new_column: str, column1: str, column2: str):
+    df[new_column] = df[column1] + df[column2]
+
+def rearrange_columns(df: pd.DataFrame, new_columns_list):
+    # cols = list(df.columns)
+    # df = df[cols[0:4] + [cols[-1]] + cols[4:12]]
+    return df[new_columns_list]
+
+def conditional_change_set_where(df: pd.DataFrame, column: str, if_value, set_column: str, to_value):
+    # df.loc[df['Type 1'] == 'Fire', ['Type 1', 'Type 2']] = ['Flamer', 'Fiery']
+    df.loc[df[column] == if_value, [set_column]] = [to_value]
+
+def group_by_mean(df: pd.DataFrame, group_by_column: str, sort_by_column: str):
+    # df = df.groupby(['Type 1']).mean().sort_values('Defense', ascending=False)
+    return df.groupby([group_by_column]).mean().sort_values(sort_by_column, ascending=False)
+
+def group_by_count(df: pd.DataFrame, columns: list):
+    # df['count'] = 1
+    # df = df.groupby(['Type 1', 'Type 2']).count()['count']
+    df['count'] = 1
+    return df.groupby(columns).count()['count']
+
+def reading_by_chunk_and_grouping(df: pd.DataFrame, group_by_column: str):
+    new_df = pd.DataFrame(columns=df.columns)
+    # chunksize = rows
+    for df in pd.read_csv(file_name, chunksize=5):
+        result = df.groupby([group_by_column]).count()
+        new_df = pd.concat([new_df, result])
