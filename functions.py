@@ -1,8 +1,9 @@
 import pandas as pd
-import regex
+import re
+import pandas_profiling as pp
 
 def read_csv(file_name: str, separator: str):
-    return pd.read_csv(file_name, separator=separator)
+    return pd.read_csv(file_name, sep=separator)
 
 def saving_csv(df: pd.DataFrame, file_name: str):
     df.to_csv(f"{file_name}.csv", index=False)
@@ -61,7 +62,7 @@ def sort(df: pd.DataFrame, columns: list, asc_desc: list):
     df.sort_values(columns, ascending=asc_desc, inplace=True)
 
 def drop_columns(df: pd.DataFrame, columns: list):
-    df.drop(columns=columns, inplace=True)
+    df.drop(columns=columns, inplace=True, axis="columns")
 
 def new_column_addition(df: pd.DataFrame, new_column: str, column1: str, column2: str):
     df[new_column] = df[column1] + df[column2]
@@ -91,3 +92,90 @@ def reading_by_chunk_and_grouping(df: pd.DataFrame, group_by_column: str):
     for df in pd.read_csv(file_name, chunksize=5):
         result = df.groupby([group_by_column]).count()
         new_df = pd.concat([new_df, result])
+
+# ---
+
+def missing_data(df: pd.DataFrame):
+    return df.isnull().sum(), df.isna().sum()
+
+def shape(df: pd.DataFrame):
+    return df.shape
+
+def dtypes(df: pd.DataFrame):
+    return df.dtypes
+
+def versions():
+    return pd._version, pd.show_versions()
+
+def rename_columns(df: pd.DataFrame, from_to: dict):
+    df.rename(from_to, axis='columns', inplace=True)
+
+def prefix_columns(df: pd.DataFrame, string: str):
+    df.add_prefix(str)
+
+def suffix_columns(df: pd.DataFrame, string: str):
+    df.add_suffix(str)
+
+def reverse_rows(df: pd.DataFrame):
+    reverse_df = df.loc[::-1]
+    redefine_index(reverse_df)
+    return reverse_df
+
+def reverse_columns(df: pd.DataFrame):
+    reverse_df = df.loc[:, ::1]
+    return reverse_df
+
+def select_dtypes(df: pd.DataFrame, dtypes_list: list, include_or_exclude: bool):
+    if include_or_exclude:
+        return df.select_dtypes(include=dtypes_list)
+    else:
+        return df.select_dtypes(exclude=dtypes_list)
+
+def string_to_numeric(df: pd.DataFrame):
+    return df.apply(pd.to_numeric, errors="coerce").fillna(0)
+
+def append_dfs(df1: pd.DataFrame, df2: pd.DataFrame):
+    return pd.concat([df1, df2], ignore_index=True)
+
+def concact_dfs(df1: pd.DataFrame, df2: pd.DataFrame):
+    return pd.concat([df1, df2], ignore_index=True, axis='columns')
+
+def from_clipboard(separator: str):
+    return pd.read_clipboard(sep=separator)
+
+def unique_column(df: pd.DataFrame, column: str):
+    return df[column].unique()
+
+def filter_by_columns(df: pd.DataFrame, column: str, values_list: list, not_in: bool = False):
+    if not_in:
+        return df[~df[column].isin(values_list)]
+    else:
+        return df[df[column].isin(values_list)]
+
+def dropa_na_columns(df: pd.DataFrame, threshhold: float):
+    return df.dropna(thresh=len(df) * threshhold, axis='columns')
+
+def split_string_into_columns(df: pd.DataFrame, new_columns: list, column: str, separator: str):
+    df[new_columns] = df[column].str.split(separator, expand=True)
+
+def slice(df: pd.DataFrame, row_slice: list, column_slice: list):
+    return df.loc[row_slice[0]:row_slice[1], column_slice[0]:column_slice[1]]
+
+def set_float_precision(precision: int):
+    pd.set_option('display.float_format', '{:.xf}'.replace('x', precision).format)
+
+def profile_df(df: pd.DataFrame):
+    pp.ProfileReport(df)
+
+def worth_mentioning():
+    pass
+'''
+    reverse groupby: .unstack()
+    continous to category: pd.cut
+    
+    apply example:
+    def func(row):
+        return (f"{row['col1']} - row['col2']")
+    df.apply(func, axis = 1)
+    df['new_col'] = df['col'].apply(func, args=[10, 100])
+'''
