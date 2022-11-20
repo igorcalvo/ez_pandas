@@ -212,7 +212,7 @@ def process_df(input_df: pd.DataFrame, column: str, function_to_apply, arg_list:
     output_df[column] = output_df.apply(function_to_apply, axis=1, args=arg_list)
     return output_df
 
-def apply_parallel(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
+def parallel_apply(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
     import multiprocessing
     from numpy import array_split
     from itertools import repeat
