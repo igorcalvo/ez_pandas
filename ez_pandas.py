@@ -115,11 +115,11 @@ def select_dtypes(df: pd.DataFrame, dtypes_list: list, include_or_exclude: bool)
         return df.select_dtypes(exclude=dtypes_list)
 
 def where_column_equals(df: pd.DataFrame, column: str, value, not_equal: bool = False) -> pd.DataFrame:
-    return df.loc[(df[column] == value)]
+    return df.loc[(df[column] != value)] if not not_equal else df.loc[(df[column] == value)]
 
-def where_column_doesnt_contain(df: pd.DataFrame, column: str, value: str) -> pd.DataFrame:
+def where_column_contains(df: pd.DataFrame, column: str, value: str, doesnt_contain: bool = False) -> pd.DataFrame:
     # print(df.loc[(df['Type 1'] == "Grass") & (~df['Name'].str.contains("v"))])
-    return df.loc[~df[column].str.contains(value)]
+    return df.loc[~df[column].str.contains(value)] if doesnt_contain else df.loc[df[column].str.contains(value)]
 
 def where_column_regex(df: pd.DataFrame, column: str, regex: str = "^pi[a-z]*") -> pd.DataFrame:
     # print(df.loc[df['Name'].str.contains("y|z", flags=re.I, regex=True)])
