@@ -21,7 +21,7 @@ def save_csv(df: pd.DataFrame, file_name: str):
 def save_xlsx(df: pd.DataFrame, file_name: str):
     df.to_excel(fix_file_name(file_name, 'xlsx'), index=False)
 
-def save_sheets_xlsx(df_list: list, sheet_names: list, output_filename: str, output_path: str = ''):
+def save_sheets_xlsx(df_list: list, sheet_names: list, output_filename: str, output_path: str = '') -> str:
     if len(df_list) != len(sheet_names):
         raise Exception(f"save_xlsx: length of df_list: {len(df_list)} doesn't match the length of sheet_names: {len(sheet_names)}")
 
@@ -34,6 +34,7 @@ def save_sheets_xlsx(df_list: list, sheet_names: list, output_filename: str, out
     with pd.ExcelWriter(full_path) as writer:
         for index, df in enumerate(df_list):
             df.to_excel(writer, sheet_names[index], index=False)
+    return full_path
 
 def from_clipboard(separator: str):
     return pd.read_clipboard(sep=separator)
@@ -96,6 +97,9 @@ def get_row_by_index(df: pd.DataFrame, index: int) -> pd.DataFrame:
     # print(df.iloc[1:3].to_string())
     return df.iloc[i]
 
+def get_single_value(df: pd.DataFrame, column: str):
+    return df[column].values[0]
+
 def slice(df: pd.DataFrame, row_slice: list, column_slice: list) -> pd.DataFrame:
     return df.loc[row_slice[0]:row_slice[1], column_slice[0]:column_slice[1]]
 
@@ -132,7 +136,7 @@ def sort(df: pd.DataFrame, columns: list, asc_desc: list):
     # df.sort_values(['Type 1', 'Name'], ascending=[0,1], inplace=True)
     df.sort_values(columns, ascending=asc_desc, inplace=True)
 
-def rearrange_columns(df: pd.DataFrame, new_columns_list) -> pd.DataFrame:
+def reorder_columns(df: pd.DataFrame, new_columns_list) -> pd.DataFrame:
     # cols = list(df.columns)
     # df = df[cols[0:4] + [cols[-1]] + cols[4:12]]
     return df[new_columns_list]
