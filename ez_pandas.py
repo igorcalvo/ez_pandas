@@ -180,6 +180,7 @@ def string_to_numeric(df: pd.DataFrame):
 def append_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([df1, df2], ignore_index=True)
 
+# SIDE BY SIDE, COLUMNS!
 def concact_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([df1, df2], ignore_index=True, axis='columns')
 
