@@ -193,6 +193,10 @@ def split_string_into_columns(df: pd.DataFrame, new_columns: list, column: str, 
 def loop_iterate(df: pd.DataFrame):
     for index, row in df.iterrows():
         return (index, row)
+
+def join(df1: pd.DataFrame, df2: pd.DataFrame, column: str, how: str = 'left') -> pd.DataFrame:
+    return pd.merge(df1, df2, how=how, on=column)
+    # return pd.merge(df1, df2.rename(columns={'id1': 'id'}), on='id', how='left')
 #endregion
 
 #region GroupBy
