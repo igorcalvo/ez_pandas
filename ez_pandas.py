@@ -15,15 +15,18 @@ def fix_file_name(file_name: str, extension: str) -> str:
 def read_csv(file_name: str, separator: str):
     return pd.read_csv(fix_file_name(file_name, 'csv'), sep=separator)
 
-def save_csv(df: pd.DataFrame, file_name: str):
+def read_xlsx(file_name: str):
+    return pd.read_excel(fix_file_name(file_name, 'xlsx'))
+
+def export_csv(df: pd.DataFrame, file_name: str):
     df.to_csv(fix_file_name(file_name, 'csv'), index=False)
 
-def save_xlsx(df: pd.DataFrame, file_name: str):
+def export_xlsx(df: pd.DataFrame, file_name: str):
     df.to_excel(fix_file_name(file_name, 'xlsx'), index=False)
 
-def save_sheets_xlsx(df_list: list, sheet_names: list, output_filename: str, output_path: str = '') -> str:
+def export_sheets_xlsx(df_list: list, sheet_names: list, output_filename: str, output_path: str = '') -> str:
     if len(df_list) != len(sheet_names):
-        raise Exception(f"save_xlsx: length of df_list: {len(df_list)} doesn't match the length of sheet_names: {len(sheet_names)}")
+        raise Exception(f"export_sheets_xlsx: length of df_list: {len(df_list)} doesn't match the length of sheet_names: {len(sheet_names)}")
 
     if output_path != '':
         path = output_path[:len(output_path - 1)] if output_path[-1] == '/' else output_path
@@ -82,7 +85,10 @@ def profile_df(df: pd.DataFrame):
 #endregion
 
 #region Get
-def get_value(df: pd.DataFrame, row: int, column: int) -> pd.DataFrame:
+def get_value(df: pd.DataFrame, row: int, column: str) -> pd.DataFrame:
+    return df.iloc[row, get_column_index(df, column)]
+
+def at(df: pd.DataFrame, row: int, column: int) -> pd.DataFrame:
     # print(df.iloc[2, 2])
     return df.iloc[row, column]
 
@@ -212,12 +218,12 @@ def group_by_count(df: pd.DataFrame, columns: list) -> pd.DataFrame:
 #endregion
 
 #region Parallel
-def process_df(input_df: pd.DataFrame, column: str, function_to_apply, arg_list: list) -> pd.DataFrame:
+def process_df_row(input_df: pd.DataFrame, column: str,  function_to_apply, arg_list: list) -> pd.DataFrame:
     output_df = input_df.copy(deep=True)
-    output_df[column] = output_df.apply(function_to_apply, axis=1, args=arg_list)
+    output_df[column] = output_df.apply(function_to_apply, args=arg_list, axis=1)
     return output_df
 
-def parallel_apply(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
+def parallel_apply_row(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
     import multiprocessing
     from numpy import array_split
     from itertools import repeat
@@ -226,8 +232,24 @@ def parallel_apply(df: pd.DataFrame, column: str, function_to_apply, arg_list: l
         cores = multiprocessing.cpu_count() - 2
     df_chunks = array_split(df, cores)
     with multiprocessing.Pool(cores) as pool:
-        # full_output_df = pd.concat(pool.map(process_df, df_chunks), ignore_index=True)
         full_output_df = pd.concat(pool.starmap(process_df, zip(df_chunks, repeat(column), repeat(function_to_apply), repeat(arg_list))), ignore_index=True)
+    return full_output_df
+
+def process_df_column(input_df: pd.DataFrame, new_column: str, apply_at_column: str,  function_to_apply, arg_list: list) -> pd.DataFrame:
+    output_df = input_df.copy(deep=True)
+    output_df[new_column] = output_df[apply_at_column].apply(function_to_apply, args=arg_list, axis=1)
+    return output_df
+
+def parallel_apply_column(df: pd.DataFrame, new_column: str, apply_at_column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
+    import multiprocessing
+    from numpy import array_split
+    from itertools import repeat
+
+    if cores == 0:
+        cores = multiprocessing.cpu_count() - 2
+    df_chunks = array_split(df, cores)
+    with multiprocessing.Pool(cores) as pool:
+        full_output_df = pd.concat(pool.starmap(process_df_column, zip(df_chunks, repeat(new_column), repeat(apply_at_column), repeat(function_to_apply), repeat(arg_list))), ignore_index=True)
     return full_output_df
 #endregion
 
