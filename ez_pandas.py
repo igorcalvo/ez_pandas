@@ -62,8 +62,8 @@ def print_ending(df: pd.DataFrame, rows: int):
 #endregion
 
 #region DF Info
-def get_headers(df: pd.DataFrame):
-    return df.columns
+def get_headers(df: pd.DataFrame, return_list: bool = False):
+    return df.columns if not return_list else list(df.columns)
 
 def describe(df: pd.DataFrame):
     return df.describe().to_string()
@@ -185,6 +185,9 @@ def string_to_numeric(df: pd.DataFrame):
 
 def append_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([df1, df2], ignore_index=True)
+
+def append_df_list(df_list: list) -> pd.DataFrame:
+    return pd.concat(df_list, ignore_index=True)
 
 # SIDE BY SIDE, COLUMNS!
 def concact_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
