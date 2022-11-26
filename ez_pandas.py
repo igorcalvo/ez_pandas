@@ -189,6 +189,10 @@ def append_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
 def append_df_list(df_list: list) -> pd.DataFrame:
     return pd.concat(df_list, ignore_index=True)
 
+def insert_column(df: pd.DataFrame, column_index: int, column_name: str, value):
+    df.insert(loc=column_index, column=column_name, value=value)
+
+
 # SIDE BY SIDE, COLUMNS!
 def concact_dfs(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([df1, df2], ignore_index=True, axis='columns')
