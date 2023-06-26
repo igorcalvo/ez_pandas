@@ -225,12 +225,12 @@ def group_by_count(df: pd.DataFrame, columns: list) -> pd.DataFrame:
 #endregion
 
 #region Parallel
-def process_df_row(input_df: pd.DataFrame, column: str,  function_to_apply, arg_list: list) -> pd.DataFrame:
+def process_df(input_df: pd.DataFrame, column: str,  function_to_apply, arg_list: list) -> pd.DataFrame:
     output_df = input_df.copy(deep=True)
     output_df[column] = output_df.apply(function_to_apply, args=arg_list, axis=1)
     return output_df
 
-def parallel_apply_row(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
+def parallel_apply(df: pd.DataFrame, column: str, function_to_apply, arg_list: list, cores: int = 0) -> pd.DataFrame:
     import multiprocessing
     from numpy import array_split
     from itertools import repeat
